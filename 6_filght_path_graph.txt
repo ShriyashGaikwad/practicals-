@@ -1,0 +1,94 @@
+#include <iostream>
+#include <cstring>  // For memset to initialize arrays
+using namespace std;
+
+const int MAX = 100;  // Maximum number of cities we can have
+
+// Class to represent a graph
+class Graph {
+    int adj[MAX][MAX], n;  // adj is an adjacency matrix; n is the number of cities
+    string cities[MAX];  // Array to store the names of the cities
+
+public:
+    // Constructor to initialize the graph
+    Graph(int num) {
+        n = num;  // Set the number of cities
+        memset(adj, 0, sizeof(adj));  // Initialize adjacency matrix with 0 (no edges)
+    }
+
+    // Function to add a city
+    void addCity(int i, string name) {
+        cities[i] = name;  // Store city name at index 'i'
+    }
+
+    // Function to get the index of a city by name
+    int getIndex(string name) {
+        for (int i = 0; i < n; i++) {
+            if (cities[i] == name) return i;  // Return the index if city matches the name
+        }
+        return -1;  // If city is not found, return -1
+    }
+
+    // Function to add a flight between two cities
+    void addFlight(string a, string b, int w) {
+        int i = getIndex(a), j = getIndex(b);  // Get indices of cities 'a' and 'b'
+        if (i == -1 || j == -1) {
+            cout << "City not found!\n";  // If any city doesn't exist, print an error message
+            return;
+        }
+        adj[i][j] = adj[j][i] = w;  // Set the weight (flight cost) for the connection in both directions
+    }
+
+    // Function to show the adjacency matrix (which represents the graph)
+    void showMatrix() {
+        cout << "\nAdjacency Matrix:\n    ";
+        for (int i = 0; i < n; i++) cout << cities[i] << " ";  // Print city names at the top
+        cout << "\n";
+        for (int i = 0; i < n; i++) {  // Loop through each row of the adjacency matrix
+            cout << cities[i] << " ";  // Print the city name
+            for (int j = 0; j < n; j++) cout << adj[i][j] << " ";  // Print the row (flight costs to other cities)
+            cout << "\n";
+        }
+    }
+
+    // Function to show the adjacency list (alternative representation of the graph)
+    void showList() {
+        cout << "\nAdjacency List:\n";
+        for (int i = 0; i < n; i++) {
+            cout << cities[i] << " -> ";  // Print the city name
+            for (int j = 0; j < n; j++) {
+                if (adj[i][j] > 0)  // If there is a flight (edge) between cities
+                    cout << cities[j] << "(" << adj[i][j] << ") ";  // Print the neighboring city and the flight cost
+            }
+            cout << "\n";
+        }
+    }
+};
+
+int main() {
+    int n, m;
+    cout << "Enter number of cities: ";
+    cin >> n;  // Ask user for number of cities
+
+    Graph g(n);  // Create a graph with 'n' cities
+    for (int i = 0; i < n; i++) {
+        string name;
+        cout << "Enter city name: ";
+        cin >> name;  // Get city name from user
+        g.addCity(i, name);  // Add the city to the graph
+    }
+
+    cout << "Enter number of flights: ";
+    cin >> m;  // Ask user for number of flights
+    while (m--) {
+        string a, b;
+        int w;
+        cout << "City A, City B, Cost: ";
+        cin >> a >> b >> w;  // Get the details of the flight (cities and cost)
+        g.addFlight(a, b, w);  // Add the flight to the graph
+    }
+
+    g.showMatrix();  // Show the adjacency matrix representation of the graph
+    g.showList();    // Show the adjacency list representation of the graph
+    return 0;
+}

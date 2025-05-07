@@ -1,0 +1,105 @@
+# This class represents a contact with a name and phone number
+class Contact:
+    def __init__(self, name, number):
+        self.name = name         # Save contact's name
+        self.number = number     # Save contact's phone number
+
+# This class creates the phone book using a hash table
+class PhoneBook:
+    def __init__(self, size):
+        self.size = size                     # Set the size of the phone book
+        self.table = [None] * self.size      # Create an empty table with 'None' values
+
+    # Hash function: uses the last digit(s) of the number to get position
+    def hash_function(self, number):
+        return number % self.size
+
+    # Insert a contact into the phone book
+    def insert(self, name, number):
+        index = self.hash_function(number)   # Find initial index using hash
+
+        # Loop to find next empty slot using linear probing
+        for i in range(self.size):
+            pos = (index + i) % self.size    # Move to next index (circular)
+            if self.table[pos] is None:      # If slot is empty
+                self.table[pos] = Contact(name, number)  # Save contact
+                print("Contact saved at position", pos)
+                return
+        print("Phone book is full!")         # If no slot is found
+
+    # Display all contacts in the phone book
+    def display(self):
+        print("\n--- Phone Book ---")
+        for i in range(self.size):
+            if self.table[i] is None:
+                print(i, ": Empty")
+            else:
+                print(i, ":", self.table[i].name, "-", self.table[i].number)
+
+    # Search for a contact by phone number
+    def search(self, number):
+        index = self.hash_function(number)
+
+        for i in range(self.size):
+            pos = (index + i) % self.size
+            if self.table[pos] is None:
+                break                           # Stop if empty slot is found
+            if self.table[pos].number == number:
+                print("Found at position", pos, ":", self.table[pos].name)
+                return pos                      # Return index if found
+        print("Number not found.")
+        return None                             # Return None if not found
+
+    # Delete a contact by number
+    def delete(self, number):
+        index = self.search(number)             # Search for the number
+        if index is not None:
+            self.table[index] = None            # Delete the contact
+            print("Deleted contact at position", index)
+        else:
+            print("Number not found.")          # If not found
+
+    # Show a specific contact by number
+    def get(self, number):
+        position = self.search(number)
+        if position is not None:
+            contact = self.table[position]
+            print(position, ":", contact.name, contact.number)
+        else:
+            print("No such entry found.")
+
+# Main function to show menu and perform actions
+def main():
+    book = PhoneBook(10)     # Create phone book of size 10
+    while True:
+        print("\n--- Menu ---")
+        print("1. Add Contact")
+        print("2. Show Contacts")
+        print("3. Search Contact")
+        print("4. Delete Contact")
+        print("-1. Exit")
+
+        choice = int(input("Enter choice: "))
+
+        if choice == 1:
+            telNo = int(input("Enter mobile number: "))
+            name = input("Enter name: ")
+            book.insert(name, telNo)
+
+        elif choice == 2:
+            book.display()
+
+        elif choice == 3:
+            findTel = int(input("Enter number to search: "))
+            book.get(findTel)
+
+        elif choice == 4:
+            findTel = int(input("Enter number to delete: "))
+            book.delete(findTel)
+
+        elif choice == -1:
+            print("=== END ===")
+            break
+
+# Start the program
+main()

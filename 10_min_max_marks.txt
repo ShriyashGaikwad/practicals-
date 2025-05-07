@@ -1,0 +1,66 @@
+#include <iostream>
+using namespace std;
+
+class Heap {
+    int maxHeap[100]; // For storing max heap (largest value at root)
+    int minHeap[100]; // For storing min heap (smallest value at root)
+    int size;         // Number of students
+
+public:
+    Heap() {
+        maxHeap[0] = 0; // index 0 stores the count
+        minHeap[0] = 0;
+    }
+
+    // Insert into Max Heap
+    void insertMax(int value) {
+        int i = ++maxHeap[0]; // Increase size
+        while (i > 1 && value > maxHeap[i / 2]) { // Compare with parent
+            maxHeap[i] = maxHeap[i / 2]; // Move parent down
+            i = i / 2;
+        }
+        maxHeap[i] = value; // Place value at correct position
+    }
+
+    // Insert into Min Heap
+    void insertMin(int value) {
+        int i = ++minHeap[0];
+        while (i > 1 && value < minHeap[i / 2]) {
+            minHeap[i] = minHeap[i / 2];
+            i = i / 2;
+        }
+        minHeap[i] = value;
+    }
+
+    void getInput() {
+        cout << "Enter number of students: ";
+        cin >> size;
+
+        cout << "Enter marks of students:\n";
+        for (int i = 0; i < size; i++) {
+            int mark;
+            cin >> mark;
+            insertMax(mark); // Build max heap
+            insertMin(mark); // Build min heap
+        }
+    }
+
+    void displayMinMax() {
+        cout << "\nMaximum Marks (Top of Max Heap): " << maxHeap[1];
+        cout << "\nMax Heap Structure:\n";
+        for (int i = 1; i <= maxHeap[0]; i++)
+            cout << maxHeap[i] << " ";
+
+        cout << "\n\nMinimum Marks (Top of Min Heap): " << minHeap[1];
+        cout << "\nMin Heap Structure:\n";
+        for (int i = 1; i <= minHeap[0]; i++)
+            cout << minHeap[i] << " ";
+    }
+};
+
+int main() {
+    Heap h;
+    h.getInput();       // Get data and insert into heaps
+    h.displayMinMax();  // Display results
+    return 0;
+}

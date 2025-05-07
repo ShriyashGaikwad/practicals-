@@ -1,0 +1,49 @@
+import random  # Import the random module to simulate dice rolls
+
+# Define positions of snakes and ladders using dictionaries
+snakes = {14: 7, 25: 5}     # If a player lands on 14 or 25, they go down to 7 or 5
+ladders = {3: 22, 8: 26}    # If a player lands on 3 or 8, they go up to 22 or 26
+
+# Function to simulate rolling a dice
+def roll_dice():
+    return random.randint(1, 6)  # Returns a random integer between 1 and 6
+
+# Function to play the game
+def play_game():
+    position = 1  # Player starts at position 1
+
+    # Loop continues until the player reaches square 30
+    while position < 30:
+        input("\nPress Enter to roll the dice...")  # Wait for the user to press Enter
+        dice = roll_dice()  # Roll the dice
+        print(f"You rolled a {dice}")
+        
+        position += dice  # Move the player forward by the dice value
+
+        # Check if player wins
+        if position == 30:
+            print("You reached 30 exactly! You win!")  # Exact win
+            break
+        elif position > 30:
+            position -= dice  # If move goes past 30, undo the move
+            print("You need to roll a smaller number to win.")  # Notify the user
+
+        # Check if the player landed on a snake
+        if position in snakes:
+            print(f"Oh no! Snake at {position}. Go back to {snakes[position]}")
+            position = snakes[position]  # Move down to the tail of the snake
+
+        # Check if the player landed on a ladder
+        elif position in ladders:
+            print(f"Yay! Ladder at {position}. Climb to {ladders[position]}")
+            position = ladders[position]  # Move up to the top of the ladder
+
+        # Show the updated position
+        print(f"You're now on square {position}")
+
+    print("Game Over!")  # Game ends when the player wins
+
+# Start the game
+if __name__ == "__main__":
+    print("Welcome to Snakes and Ladders!")  # Game title
+    play_game()  # Call the function to start the game

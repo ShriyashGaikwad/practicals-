@@ -1,0 +1,91 @@
+# Class to represent each data entry with a key and index
+class Entry:
+    def __init__(self, key, index):
+        self.key = key  # Value to be stored
+        self.index = index  # Index where the key is stored
+
+# Class to represent the Hash Table
+class HashTable:
+    def __init__(self, size):
+        self.size = size  # Size of the hash table
+        self.table = [None] * size  # Initialize an empty table of 'size' length
+
+    # Simple hash function that gives the index by taking modulo with size
+    def hash_function(self, key):
+        return key % self.size  # Calculate index
+
+    # Function to insert a key into the hash table
+    def insert(self, key):
+        index = self.hash_function(key)  # Find index using the hash function
+
+        # If the position is empty, insert the key
+        if self.table[index] is None:
+            self.table[index] = Entry(key, index)
+            print(f"Key {key} inserted at index {index}")
+        else:
+            # If the position is already occupied, find the next empty spot using linear probing
+            i = index
+            while True:
+                i = (i + 1) % self.size  # Move to the next index (with wrapping around)
+                if self.table[i] is None:
+                    self.table[i] = Entry(key, i)
+                    print(f"Key {key} inserted at index {i}")
+                    break
+
+    # Function to display the hash table
+    def display(self):
+        for i in range(self.size):
+            if self.table[i] is None:
+                print(f"Index {i}: Empty")
+            else:
+                print(f"Index {i}: Key = {self.table[i].key}")
+
+    # Function to search for a key in the table
+    def search(self, key):
+        index = self.hash_function(key)  # Find the index using hash function
+        i = index
+        while self.table[i] is not None:
+            if self.table[i].key == key:  # If key is found
+                print(f"Key {key} found at index {i}")
+                return i
+            i = (i + 1) % self.size  # Move to the next index using linear probing
+        print(f"Key {key} not found")
+        return None
+
+    # Function to delete a key from the table
+    def delete(self, key):
+        index = self.search(key)  # Find the index of the key
+        if index is not None:
+            self.table[index] = None  # Delete the key at that index
+            print(f"Key {key} deleted from index {index}")
+
+# Main function to drive the program
+def main():
+    size = int(input("Enter the size of the hash table: "))  # Input size of table
+    ht = HashTable(size)  # Create a new hash table with the specified size
+
+    while True:
+        print("\n1. Insert\n2. Display\n3. Search\n4. Delete\n-1. Exit")  # Show menu
+        choice = int(input("Enter your choice: "))  # Get the user's choice
+
+        if choice == 1:
+            key = int(input("Enter key to insert: "))  # Input the key to insert
+            ht.insert(key)
+
+        elif choice == 2:
+            ht.display()  # Display the contents of the table
+
+        elif choice == 3:
+            key = int(input("Enter key to search: "))  # Input the key to search
+            ht.search(key)
+
+        elif choice == 4:
+            key = int(input("Enter key to delete: "))  # Input the key to delete
+            ht.delete(key)
+
+        elif choice == -1:
+            print("Exiting the program...")  # Exit the program
+            break
+
+# Run the main function
+main()

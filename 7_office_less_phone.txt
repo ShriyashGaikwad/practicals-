@@ -1,0 +1,110 @@
+#include <iostream>
+#include <vector>
+#include <climits> // For INT_MAX
+using namespace std;
+
+// Class to represent a Graph
+class Graph {
+private:
+    int num;  // Number of cities
+    vector<vector<int>> adjMatrix;  // Adjacency matrix to store connection costs
+    vector<string> cities;  // Names of the cities
+
+public:
+    // Constructor
+    Graph(int n) {
+        num = n;
+        adjMatrix.resize(n, vector<int>(n, 0)); // Initialize matrix with 0
+        cities.resize(n); // Resize city names vector
+
+        // Input city names
+        cout << "Enter names of all cities:\n";
+        for (int i = 0; i < n; i++) {
+            cout << "City " << i + 1 << ": ";
+            cin >> cities[i];
+        }
+
+        // Input cost to connect each pair of cities
+        cout << "\nEnter the cost to connect cities. Enter 0 if no direct connection.\n";
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                cout << "Cost to connect " << cities[i] << " to " << cities[j] << ": ";
+                cin >> adjMatrix[i][j];
+                adjMatrix[j][i] = adjMatrix[i][j]; // Since it's an undirected graph
+            }
+        }
+    }
+
+    // Function to find MST using Prim's Algorithm
+    void prims() {
+        vector<int> parent(num, -1);        // To store MST edges
+        vector<int> key(num, INT_MAX);      // Minimum weight edge to a vertex
+        vector<bool> inMST(num, false);     // To track visited vertices
+        key[0] = 0;                          // Start from the first city
+        int totalCost = 0;                  // To store total cost of MST
+
+        // Run Prim's algorithm
+        for (int count = 0; count < num - 1; count++) {
+            int min = INT_MAX, u = -1;
+
+            // Find the vertex with the smallest key value not yet in MST
+            for (int v = 0; v < num; v++) {
+                if (!inMST[v] && key[v] < min) {
+                    min = key[v];
+                    u = v;
+                }
+            }
+
+            inMST[u] = true; // Include selected vertex in MST
+
+            // Update key and parent values of adjacent vertices
+            for (int v = 0; v < num; v++) {
+                if (adjMatrix[u][v] && !inMST[v] && adjMatrix[u][v] < key[v]) {
+                    key[v] = adjMatrix[u][v];
+                    parent[v] = u;
+                }
+            }
+        }
+
+        // Print the MST
+        cout << "\nMinimum Spanning Tree using Prim's Algorithm:\n";
+        for (int i = 1; i < num; i++) {
+            cout << cities[parent[i]] << " --> " << cities[i]
+                 << " (Cost: " << adjMatrix[parent[i]][i] << ")\n";
+            totalCost += adjMatrix[parent[i]][i];
+        }
+
+        cout << "Total cost of MST: " << totalCost << endl;
+    }
+};
+
+// Main function
+int main() {
+    int n;
+    cout << "Enter number of cities: ";
+    cin >> n;
+
+    Graph g(n); // Create graph object with 'n' cities
+
+    int choice;
+    do {
+        cout << "\nMENU:\n";
+        cout << "1. Find Minimum Spanning Tree (Prim's Algorithm)\n";
+        cout << "2. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                g.prims(); // Call MST function
+                break;
+            case 2:
+                cout << "Exiting program...\n";
+                break;
+            default:
+                cout << "Invalid choice. Please try again.\n";
+        }
+    } while (choice != 2);
+
+    return 0;
+}

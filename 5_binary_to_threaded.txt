@@ -1,0 +1,174 @@
+#include <iostream>
+using namespace std;
+
+// Node structure for TBT
+class Node {
+public:
+    int data;             // Stores node value
+    Node *left, *right;   // Pointers to left and right child (or thread)
+    bool lbit, rbit;      // Flags: true = child, false = thread
+
+    // Constructor
+    Node(int val = 0) {
+        data = val;
+        left = right = nullptr;
+        lbit = rbit = false;
+    }
+};
+
+// Threaded Binary Tree class
+class TBT {
+    Node *root; // Dummy root node
+
+public:
+    // Constructor to initialize dummy node
+    TBT() {
+        root = new Node(9999);     // Dummy node holds a sentinel value
+        root->left = root;         // Initially no left child
+        root->right = root;        // Right points to itself
+        root->lbit = false;
+        root->rbit = true;         // Right is always a thread
+    }
+
+    void insert(int val);         // Insert a new value
+    void inorder();               // Inorder traversal
+    void preorder();              // Preorder traversal
+
+private:
+    Node* inorderSuccessor(Node* current);   // Helper to find inorder successor
+    Node* preorderSuccessor(Node* current);  // Helper to find preorder successor
+};
+
+// Insert a new node into the TBT
+void TBT::insert(int val) {
+    Node *newNode = new Node(val); // Create new node
+
+    // If tree is empty (no real nodes)
+    if (root->lbit == false) {
+        newNode->left = root;
+        newNode->right = root;
+        root->left = newNode;
+        root->lbit = true; // Tree now has a left child
+        return;
+    }
+
+    Node *current = root->left; // Start from the actual root
+    while (true) {
+        if (val < current->data) {
+            // Move left
+            if (current->lbit == false) {
+                // Insert to the left (no left child exists)
+                newNode->left = current->left;
+                newNode->right = current;
+                current->left = newNode;
+                current->lbit = true;
+                return;
+            }
+            current = current->left;
+        } else if (val > current->data) {
+            // Move right
+            if (current->rbit == false) {
+                // Insert to the right (no right child exists)
+                newNode->right = current->right;
+                newNode->left = current;
+                current->right = newNode;
+                current->rbit = true;
+                return;
+            }
+            current = current->right;
+        } else {
+            // Duplicate value, do not insert
+            delete newNode;
+            return;
+        }
+    }
+}
+
+// Find inorder successor of a node
+Node* TBT::inorderSuccessor(Node* current) {
+    if (current->rbit == false)
+        return current->right; // If right is a thread
+
+    // Move to right subtree and then all the way left
+    current = current->right;
+    while (current->lbit)
+        current = current->left;
+    return current;
+}
+
+// Inorder traversal of TBT
+void TBT::inorder() {
+    Node *current = root->left;
+
+    // Go to the leftmost node
+    while (current->lbit)
+        current = current->left;
+
+    // Traverse using inorderSuccessor
+    while (current != root) {
+        cout << current->data << " ";
+        current = inorderSuccessor(current);
+    }
+}
+
+// Find preorder successor of a node
+Node* TBT::preorderSuccessor(Node* current) {
+    if (current->lbit)
+        return current->left; // First go to left child
+
+    // If no left child, follow right threads
+    while (current->rbit == false)
+        current = current->right;
+
+    return current->right;
+}
+
+// Preorder traversal of TBT
+void TBT::preorder() {
+    Node *current = root->left;
+    while (current != root) {
+        cout << current->data << " ";
+        current = preorderSuccessor(current);
+    }
+}
+
+// Main function with menu
+int main() {
+    TBT tree;
+    int choice, value;
+
+    do {
+        cout << "\n1. Insert\n2. Inorder\n3. Preorder\n4. Exit\nChoice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "Enter value: ";
+            cin >> value;
+            tree.insert(value);
+            break;
+
+        case 2:
+            cout << "Inorder: ";
+            tree.inorder();
+            cout << endl;
+            break;
+
+        case 3:
+            cout << "Preorder: ";
+            tree.preorder();
+            cout << endl;
+            break;
+
+        case 4:
+            cout << "Exiting...\n";
+            break;
+
+        default:
+            cout << "Invalid choice!\n";
+        }
+
+    } while (choice != 4); // Repeat until exit
+
+    return 0;
+}

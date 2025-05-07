@@ -1,0 +1,108 @@
+# This class represents one phone book entry (name and phone number)
+class PhoneBook:
+    def __init__(self, name, telNo):
+        self.name = name        # Store the name
+        self.telNo = telNo      # Store the phone number
+
+# This class represents the hash table for storing phone book entries
+class HashTable:
+    def __init__(self, size):
+        self.size = size                # Size of the hash table (total number of slots)
+        self.table = [None] * size      # Initialize all slots with None (empty)
+
+    # Hash function: calculates index to store based on phone number
+    def hash_function(self, key):
+        return key % self.size          # Simple modulo hash function
+
+    # Insert a contact into the hash table
+    def insert(self, name, telNo):
+        index = self.hash_function(telNo)   # Calculate index using hash function
+        original_index = index              # Keep original index to detect full loop
+
+        # Check if slot is already taken (collision handling using linear probing)
+        while self.table[index] is not None:
+            if self.table[index].telNo == telNo:
+                print("Number already exists!")  # Avoid duplicate phone numbers
+                return
+            index = (index + 1) % self.size      # Move to next slot
+            if index == original_index:          # If we come back to start, table is full
+                print("Table is full!")
+                return
+
+        # If empty slot is found, store the contact
+        self.table[index] = PhoneBook(name, telNo)
+        print("Stored successfully.")
+
+    # Display all entries in the hash table
+    def display(self):
+        for i, entry in enumerate(self.table):
+            if entry is None:
+                print(f"{i} : - -")              # Empty slot
+            else:
+                print(f"{i} : {entry.name} - {entry.telNo}")  # Show name and number
+
+    # Search for a contact using the phone number
+    def search(self, telNo):
+        index = self.hash_function(telNo)
+        original_index = index
+
+        # Keep checking until we find the number or reach the end
+        while self.table[index] is not None:
+            if self.table[index].telNo == telNo:
+                print(f"Found at index {index}: {self.table[index].name}")
+                return
+            index = (index + 1) % self.size
+            if index == original_index:
+                break
+        print("Number not found.")
+
+    # Delete a contact using the phone number
+    def delete(self, telNo):
+        index = self.hash_function(telNo)
+        original_index = index
+
+        while self.table[index] is not None:
+            if self.table[index].telNo == telNo:
+                self.table[index] = None            # Delete by setting slot to None
+                print(f"Deleted entry at index {index}")
+                return
+            index = (index + 1) % self.size
+            if index == original_index:
+                break
+        print("Number not found.")
+
+# ----------- Main Program Starts Here ------------
+
+# Create a hash table with 10 slots
+obj = HashTable(10)
+
+# Menu-driven program loop
+while True:
+    print("\n--- MENU ---")
+    print("1: Insert")
+    print("2: Display")
+    print("3: Search")
+    print("4: Delete")
+    print("-1: Exit")
+
+    # Ask user for choice
+    choice = int(input("Enter your choice: "))
+
+    # Perform actions based on choice
+    if choice == 1:
+        name = input("Enter name: ")
+        telNo = int(input("Enter phone number: "))
+        obj.insert(name, telNo)
+    elif choice == 2:
+        obj.display()
+    elif choice == 3:
+        telNo = int(input("Enter phone number to search: "))
+        obj.search(telNo)
+    elif choice == 4:
+        telNo = int(input("Enter phone number to delete: "))
+        obj.delete(telNo)
+    elif choice == -1:
+        print("Goodbye!")
+        break
+    else:
+        print("Invalid choice.")

@@ -1,0 +1,108 @@
+#include <iostream>     // For input-output
+#include <fstream>      // For file handling
+using namespace std;
+
+// Student class
+class Student {
+public:
+    int roll;       // Roll number of student
+    string name;    // Name of student
+
+    // Function to create and save student data
+    void create() {
+        ofstream fout("student.txt", ios::app); // Open file in append mode
+        cout << "\nEnter Roll No: ";
+        cin >> roll;
+        cout << "Enter Name: ";
+        cin >> name;
+        fout << roll << " " << name << endl;    // Write to file
+        fout.close();                           // Close file
+        cout << "Record added.\n";
+    }
+
+    // Function to display all student records
+    void display() {
+        ifstream fin("student.txt");            // Open file for reading
+        cout << "\nRoll No\tName\n";
+        while (fin >> roll >> name) {           // Read each line
+            cout << roll << "\t" << name << endl;
+        }
+        fin.close();                            // Close file
+    }
+
+    // Function to search a record by roll number
+    void search() {
+        int r;
+        bool found = false;
+        cout << "Enter roll number to search: ";
+        cin >> r;
+
+        ifstream fin("student.txt");            // Open file
+        while (fin >> roll >> name) {           // Read each record
+            if (roll == r) {                    // If roll matches
+                cout << "\nRecord Found: Roll No: " << roll << ", Name: " << name << endl;
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            cout << "Record not found.\n";      // If not found
+        fin.close();                            // Close file
+    }
+
+    // Function to delete a student record
+    void Delete() {
+        int r;
+        bool found = false;
+        cout << "Enter roll number to delete: ";
+        cin >> r;
+
+        ifstream fin("student.txt");            // Open original file
+        ofstream fout("temp.txt");              // Create temporary file
+
+        while (fin >> roll >> name) {           // Read all records
+            if (roll == r) {
+                found = true;                   // Skip the record to delete
+                continue;
+            }
+            fout << roll << " " << name << endl; // Write remaining records to temp file
+        }
+
+        fin.close();
+        fout.close();
+
+        remove("student.txt");                  // Delete old file
+        rename("temp.txt", "student.txt");      // Rename temp to original
+
+        if (found)
+            cout << "Record deleted.\n";
+        else
+            cout << "Record not found.\n";
+    }
+};
+
+// Main function
+int main() {
+    Student s;
+    int choice;
+
+    do {
+        // Display menu
+        cout << "\n--- Student Menu ---\n";
+        cout << "1. Add Student\n2. Display Students\n3. Search Student\n4. Delete Student\n5. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        // Handle user choice
+        switch (choice) {
+            case 1: s.create(); break;
+            case 2: s.display(); break;
+            case 3: s.search(); break;
+            case 4: s.Delete(); break;
+            case 5: cout << "Exiting...\n"; break;
+            default: cout << "Invalid choice!\n";
+        }
+    } while (choice != 5); // Repeat until user chooses to exit
+
+    return 0;
+}

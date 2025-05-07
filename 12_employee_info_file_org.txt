@@ -1,0 +1,110 @@
+#include <iostream>
+#include <fstream> // For file handling
+using namespace std;
+
+// Define Employee class
+class Employee {
+public:
+    int code;         // Employee code (unique ID)
+    char name[50];    // Employee name
+    float salary;     // Employee salary
+
+    // Function to read employee details from user
+    void read() {
+        cout << "Enter Employee Code: ";
+        cin >> code;
+        cout << "Enter Name: ";
+        cin.ignore();              // Clear input buffer
+        cin.getline(name, 50);     // Read full name (including spaces)
+        cout << "Enter Salary: ";
+        cin >> salary;
+    }
+
+    // Function to display employee details
+    void display() {
+        cout << "Code: " << code << ", Name: " << name << ", Salary: " << salary << endl;
+    }
+};
+
+// Function to add a new employee to the file
+void addEmployee() {
+    Employee emp;
+    emp.read(); // Get employee details from user
+
+    ofstream out("employee.txt", ios::app); // Open file in append mode
+    out.write((char*)&emp, sizeof(emp));   // Write employee object to file
+    out.close();
+
+    cout << "Employee added.\n";
+}
+
+// Function to show all employee records
+void showAll() {
+    Employee emp;
+    ifstream in("employee.txt"); // Open file for reading
+
+    // Read and display all records
+    while (in.read((char*)&emp, sizeof(emp))) {
+        emp.display();
+    }
+
+    in.close(); // Close the file
+}
+
+// Function to delete an employee by code
+void deleteEmployee() {
+    int code;
+    cout << "Enter employee code to delete: ";
+    cin >> code;
+
+    Employee emp;
+    bool found = false;
+
+    ifstream in("employee.txt");     // Original file
+    ofstream out("temp.txt");        // Temporary file
+
+    // Copy all records except the one to be deleted
+    while (in.read((char*)&emp, sizeof(emp))) {
+        if (emp.code != code) {
+            out.write((char*)&emp, sizeof(emp)); // Keep record
+        } else {
+            found = true; // Record to delete found
+        }
+    }
+
+    in.close();
+    out.close();
+
+    remove("employee.txt");         // Delete original file
+    rename("temp.txt", "employee.txt"); // Rename temp file as main
+
+    if (found) {
+        cout << "Employee deleted.\n";
+    } else {
+        cout << "Employee not found.\n";
+    }
+}
+
+// Main menu-driven function
+int main() {
+    int choice;
+
+    do {
+        // Display the menu
+        cout << "\n1. Add Employee\n2. Show All Employees\n3. Delete Employee\n4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        // Perform action based on user choice
+        switch (choice) {
+            case 1: addEmployee(); break;
+            case 2: showAll(); break;
+            case 3: deleteEmployee(); break;
+            case 4: cout << "Exiting...\n"; break;
+            default: cout << "Invalid choice!\n";
+        }
+
+    } while (choice != 4); // Repeat until user chooses to exit
+
+    return 0;
+}

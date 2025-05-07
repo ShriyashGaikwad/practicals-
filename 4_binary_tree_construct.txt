@@ -1,0 +1,143 @@
+#include <iostream>
+using namespace std;
+
+// Node class to represent each node in the BST
+class Node {
+public:
+    int data;
+    Node* left;
+    Node* right;
+
+    // Constructor to initialize node with data
+    Node(int val) {
+        data = val;
+        left = right = nullptr;
+    }
+};
+
+// BST class to manage all operations
+class BST {
+public:
+    Node* root;
+
+    // Constructor initializes empty tree
+    BST() {
+        root = nullptr;
+    }
+
+    // Insert a new value into the BST (recursive function)
+    Node* insert(Node* node, int val) {
+        if (!node) return new Node(val); // If node is null, create new node
+        if (val < node->data)
+            node->left = insert(node->left, val);  // Go to left subtree
+        else
+            node->right = insert(node->right, val); // Go to right subtree
+        return node; // Return the unchanged node pointer
+    }
+
+    // Inorder traversal: Left → Node → Right
+    void inorder(Node* node) {
+        if (!node) return;
+        inorder(node->left);
+        cout << node->data << " ";
+        inorder(node->right);
+    }
+
+    // Preorder traversal: Node → Left → Right
+    void preorder(Node* node) {
+        if (!node) return;
+        cout << node->data << " ";
+        preorder(node->left);
+        preorder(node->right);
+    }
+
+    // Postorder traversal: Left → Right → Node
+    void postorder(Node* node) {
+        if (!node) return;
+        postorder(node->left);
+        postorder(node->right);
+        cout << node->data << " ";
+    }
+
+    // Search a value in BST
+    bool search(Node* node, int val) {
+        if (!node) return false; // Value not found
+        if (val == node->data) return true; // Value found
+        else if (val < node->data)
+            return search(node->left, val); // Search in left subtree
+        else
+            return search(node->right, val); // Search in right subtree
+    }
+
+    // Find the minimum value in BST (leftmost node)
+    int findMin(Node* node) {
+        while (node->left) node = node->left;
+        return node->data;
+    }
+
+    // Calculate height of BST (max depth from root to leaf)
+    int height(Node* node) {
+        if (!node) return -1;
+        return 1 + max(height(node->left), height(node->right));
+    }
+};
+
+// Main function to run the program
+int main() {
+    BST tree;  // Create a BST object
+    int choice, value;
+
+    do {
+        // Menu to show options to the user
+        cout << "\n1. Insert\n2. Inorder\n3. Preorder\n4. Postorder";
+        cout << "\n5. Search\n6. Minimum\n7. Height\n0. Exit\nEnter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter value to insert: ";
+                cin >> value;
+                tree.root = tree.insert(tree.root, value);
+                break;
+            case 2:
+                cout << "Inorder: ";
+                tree.inorder(tree.root);
+                cout << endl;
+                break;
+            case 3:
+                cout << "Preorder: ";
+                tree.preorder(tree.root);
+                cout << endl;
+                break;
+            case 4:
+                cout << "Postorder: ";
+                tree.postorder(tree.root);
+                cout << endl;
+                break;
+            case 5:
+                cout << "Enter value to search: ";
+                cin >> value;
+                if (tree.search(tree.root, value))
+                    cout << "Found\n";
+                else
+                    cout << "Not Found\n";
+                break;
+            case 6:
+                if (tree.root)
+                    cout << "Minimum value: " << tree.findMin(tree.root) << endl;
+                else
+                    cout << "Tree is empty.\n";
+                break;
+            case 7:
+                cout << "Height: " << tree.height(tree.root) << endl;
+                break;
+            case 0:
+                cout << "Exiting...\n";
+                break;
+            default:
+                cout << "Invalid choice!\n";
+        }
+    } while (choice != 0);
+
+    return 0;
+}

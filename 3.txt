@@ -1,0 +1,106 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+// Node class represents each item in the tree
+class Node {
+public:
+    string data;               // Holds the data (like "Book", "Chapter", etc.)
+    vector<Node*> children;    // Vector to hold child nodes (multiple children)
+
+    // Constructor to initialize a node with a name
+    Node(string val) {
+        data = val;
+    }
+
+    // Function to add a child to the current node
+    void addChild(Node* child) {
+        children.push_back(child);
+    }
+
+    // Recursive function to display the tree structure
+    void display(int level = 0) {
+        // Print indentation based on tree level
+        for (int i = 0; i < level; i++) 
+            cout << "  ";
+        
+        // Print current node's data
+        cout << "- " << data << endl;
+
+        // Recursively display all children
+        for (Node* child : children) {
+            child->display(level + 1);
+        }
+    }
+
+    // Recursive function to search for a node with given name
+    Node* find(string name) {
+        if (data == name) return this;  // If current node matches, return it
+
+        // Search recursively in children
+        for (Node* child : children) {
+            Node* found = child->find(name);
+            if (found) return found;    // If found, return the node
+        }
+
+        return nullptr;  // Not found
+    }
+};
+
+int main() {
+    // Create root node named "Book"
+    Node* root = new Node("Book");
+
+    while (true) {
+        // Menu for user interaction
+        cout << "\nMenu:\n";
+        cout << "1. Add Node\n";
+        cout << "2. Display Tree\n";
+        cout << "3. Exit\n";
+        cout << "Enter your choice: ";
+        
+        int choice;
+        cin >> choice;
+        cin.ignore();  // Clears newline character from input buffer
+
+        if (choice == 1) {
+            string parentName, childName;
+            cout << "Enter parent node name: ";
+            getline(cin, parentName);
+
+            // Search for the parent node
+            Node* parent = root->find(parentName);
+
+            if (parent) {
+                // Get name of new child node
+                cout << "Enter new node name: ";
+                getline(cin, childName);
+
+                // Create and add new node
+                Node* newNode = new Node(childName);
+                parent->addChild(newNode);
+                cout << "Node added!\n";
+            } else {
+                cout << "Parent not found!\n";
+            }
+
+        } else if (choice == 2) {
+            // Print the entire tree structure
+            cout << "\nTree Structure:\n";
+            root->display();
+
+        } else if (choice == 3) {
+            // Exit the loop
+            cout << "Exiting...\n";
+            break;
+
+        } else {
+            // Handle invalid input
+            cout << "Invalid choice!\n";
+        }
+    }
+
+    delete root;  // Clean up memory (basic, for root only)
+    return 0;
+}
